@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # --- PostgreSQL Service ---
+  db:
+    image: postgres:15-alpine
+    container_name: my_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: mydatabase
+    ports:
+      - '5432:5432' # Host Port : Container Port
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # --- Redis Service ---
+  cache:
+    image: redis:alpine
+    container_name: my_redis
+    restart: always
+    ports:
+      - '6379:6379'
+    # Optional: Command to enable data persistence for Redis
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis_data:/data
+
+# --- Volumes ---
+# This ensures data persists even if you delete the containers
+volumes:
+  postgres_data:
+  redis_data:
