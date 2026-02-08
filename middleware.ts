@@ -1,7 +1,8 @@
 // middleware.ts - Route protection
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { auth } from '@/lib/auth';
+// import { auth } from '@/lib/auth';
+import { createAuthClient } from 'better-auth/client';
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -19,27 +20,36 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // For protected routes, verify session
-  try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
+  // that uses standard cookies rather than the heavy Node 'auth' object.
+  const sessionCookie = request.cookies.get('better-auth.session_token');
 
-    if (!session) {
-      // Redirect to login if no session
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('callbackUrl', pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-
-    // Session exists, allow access
-    return NextResponse.next();
-  } catch (error) {
-    console.error('Middleware auth error:', error);
-    // On error, redirect to login
+  if (!sessionCookie) {
     const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(loginUrl);
   }
+
+  // For protected routes, verify session
+  // try {
+  //   const session = await auth.api.getSession({
+  //     headers: request.headers,
+  //   });
+
+  //   if (!session) {
+  //     // Redirect to login if no session
+  //     const loginUrl = new URL('/login', request.url);
+  //     loginUrl.searchParams.set('callbackUrl', pathname);
+  //     return NextResponse.redirect(loginUrl);
+  //   }
+
+  //   // Session exists, allow access
+  //   return NextResponse.next();
+  // } catch (error) {
+  //   console.error('Middleware auth error:', error);
+  //   // On error, redirect to login
+  //   const loginUrl = new URL('/login', request.url);
+  //   return NextResponse.redirect(loginUrl);
+  // }
 }
 
 export const config = {

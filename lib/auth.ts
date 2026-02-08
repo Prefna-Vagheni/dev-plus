@@ -1,10 +1,11 @@
 // lib/auth.ts - Better Auth configuration
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
-import { PrismaClient } from '@prisma/client';
+// import { PrismaClient } from '@prisma/client';
+import { prisma } from './prisma';
 import { createId } from '@paralleldrive/cuid2';
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
