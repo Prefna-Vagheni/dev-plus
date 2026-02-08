@@ -1,5 +1,6 @@
 // src/app/layout.tsx
 import { Toaster } from '@/components/ui/toaster';
+import './globals.css';
 
 export default function RootLayout({
   children,
