@@ -10,6 +10,8 @@ import {
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Activity, GitCommit, GitPullRequest, Clock } from 'lucide-react';
+import { GitHubSyncButton } from '@/components/github/sync-button';
+import { RepositoriesList } from '@/components/github/repositories-list';
 
 // Stats cards data (will be dynamic later)
 async function getStats() {
@@ -110,6 +112,7 @@ export default async function DashboardPage() {
         <p className="text-gray-500 dark:text-gray-400">
           Here&apos;s what&apos;s happening with your development activity
         </p>
+        <GitHubSyncButton />
       </div>
 
       {/* Stats grid */}
@@ -127,6 +130,8 @@ export default async function DashboardPage() {
           <StatsCards />
         </Suspense>
       </div>
+
+      <RepositoriesList />
 
       {/* Main content grid */}
       <div className="grid gap-6 md:grid-cols-2">
