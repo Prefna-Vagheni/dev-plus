@@ -1,7 +1,7 @@
-// app/login/page.tsx
+// app/login/page.tsx - Login page with error handling
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn, useSession } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
@@ -12,13 +12,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Github, BarChart3, Zap, Brain } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Github, BarChart3, Zap, Brain, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, isPending } = useSession();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -28,10 +31,21 @@ export default function LoginPage() {
   }, [session, isPending, router, callbackUrl]);
 
   const handleGitHubSignIn = async () => {
-    await signIn.social({
-      provider: 'github',
-      callbackURL: callbackUrl,
-    });
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      await signIn.social({
+        provider: 'github',
+        callbackURL: callbackUrl,
+      });
+    } catch (err) {
+      console.error('Sign in error:', err);
+      setError(
+        'Failed to sign in. Please check your configuration and try again.',
+      );
+      setIsLoading(false);
+    }
   };
 
   if (isPending) {
@@ -43,7 +57,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4">
       <div className="max-w-6xl w-full grid md:grid-cols-2 gap-8 items-center">
         {/* Left side - Branding */}
         <div className="space-y-6">
@@ -109,14 +123,31 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
             <Button
               onClick={handleGitHubSignIn}
               className="w-full"
               size="lg"
               variant="default"
+              disabled={isLoading}
             >
-              <Github className="mr-2 h-5 w-5" />
-              Continue with GitHub
+              {isLoading ? (
+                <>
+                  <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  <Github className="mr-2 h-5 w-5" />
+                  Continue with GitHub
+                </>
+              )}
             </Button>
 
             <div className="text-xs text-center text-gray-500 dark:text-gray-400">
