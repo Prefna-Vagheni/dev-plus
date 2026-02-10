@@ -72,9 +72,6 @@ export class GitHubService {
     }
   }
 
-  /**
-   * Sync commi
-   */
   async syncCommits(since?: Date) {
     try {
       const sinceDate =
