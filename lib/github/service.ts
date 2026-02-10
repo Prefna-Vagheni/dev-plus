@@ -73,7 +73,7 @@ export class GitHubService {
   }
 
   /**
-   * Sync commits for all user's repositories
+   * Sync commits for all user's repositori
    */
   async syncCommits(since?: Date) {
     try {
