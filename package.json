@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "worker": "tsx watch ./server/worker.ts",
-    "worker:prod": "tsx ./server/worker.ts"
+    "worker:prod": "tsx ./server/worker.ts",
+    "worker:start": "node dist/server/worker.js"
   },
   "dependencies": {
     "@octokit/rest": "^22.0.1",
