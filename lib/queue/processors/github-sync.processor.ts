@@ -3,6 +3,7 @@ import { Job } from 'bullmq';
 import { createGitHubService } from '@/lib/github/service';
 import { prisma } from '@/lib/db';
 import { JOB_TYPES } from '../config';
+import { emitToUser } from '@/lib/websocket/server';
 
 interface GitHubSyncJobData {
   userId: string;
@@ -128,6 +129,18 @@ export async function processGitHubSyncJob(job: Job<GitHubSyncJobData>) {
       `[GitHub Sync Job] Completed ${syncType} for user ${userId}`,
       result,
     );
+
+    emitToUser(userId, 'sync:complete', {
+      syncType,
+      itemsProcessed: result.synced || 0,
+      timestamp: new Date().toISOString(),
+    });
+
+    // Emit stats update
+    emitToUser(userId, 'stats:updated', {
+      userId,
+      timestamp: new Date().toISOString(),
+    });
 
     return {
       success: true,

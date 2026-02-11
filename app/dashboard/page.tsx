@@ -17,6 +17,7 @@ import { LanguageChart } from '@/components/charts/language-chart';
 import { ActivityTimeline } from '@/components/analytics/activity-timeline';
 import { RepositoriesList } from '@/components/github/repositories-list';
 import Range from '@/components/date-range/date-range-picker';
+import { RealtimeActivityUpdates } from '@/components/realtime/activity-updates';
 
 // Stats cards data (will be dynamic later)
 async function getStats() {
@@ -241,6 +242,7 @@ export default async function DashboardPage() {
         }
       >
         <DashboardContent />
+        <RealtimeActivityUpdates />
       </Suspense>
 
       {/* Stats grid */}
