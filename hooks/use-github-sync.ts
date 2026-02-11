@@ -57,6 +57,7 @@ export function useGitHubSync() {
 }
 
 export function useGitHubStats() {
+  // eslint-disable-next-line
   const [stats, setStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
