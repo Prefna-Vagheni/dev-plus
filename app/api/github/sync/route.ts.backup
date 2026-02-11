@@ -1,5 +1,5 @@
 // app/api/github/sync/route.ts - GitHub Sync API Route
-/*
+
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth-utils';
 import { createGitHubService } from '@/lib/github/service';
@@ -102,91 +102,6 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         error: 'Failed to fetch sync stats',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 },
-    );
-  }
-}
-*/
-
-// app/api/github/sync/route.ts - Updated to use job queue
-import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth-utils';
-import { addJob } from '@/lib/queue/config';
-import { JOB_TYPES } from '@/lib/queue/config';
-
-export async function POST(request: Request) {
-  try {
-    const session = await getSession();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const userId = session.user.id;
-    const body = await request.json().catch(() => ({}));
-    const { syncType = 'all', since, incremental = false } = body;
-
-    console.log(
-      `[API] Scheduling GitHub sync for user ${userId}, type: ${syncType}`,
-    );
-
-    // Add job to queue instead of processing synchronously
-    const job = await addJob('githubSync', JOB_TYPES.SYNC_ALL, {
-      userId,
-      syncType,
-      since,
-      options: {
-        incremental,
-      },
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: 'Sync job scheduled',
-      jobId: job.id,
-      syncType,
-      status: 'queued',
-    });
-  } catch (error) {
-    console.error('[API] Error scheduling sync:', error);
-    return NextResponse.json(
-      {
-        error: 'Failed to schedule sync',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 },
-    );
-  }
-}
-
-export async function GET(request: Request) {
-  try {
-    const session = await getSession();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const userId = session.user.id;
-
-    // Get sync job history
-    const { prisma } = await import('@/lib/db');
-
-    const recentJobs = await prisma.syncJob.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-      take: 10,
-    });
-
-    return NextResponse.json({
-      success: true,
-      jobs: recentJobs,
-    });
-  } catch (error) {
-    console.error('[API] Error fetching sync jobs:', error);
-    return NextResponse.json(
-      {
-        error: 'Failed to fetch sync jobs',
         message: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 },

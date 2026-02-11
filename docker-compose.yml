@@ -16,9 +16,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   # --- Redis Service ---
-  cache:
+  redis:
     image: redis:alpine
-    container_name: my_redis
+    container_name: devpulse-redis
     restart: always
     ports:
       - '6379:6379'
