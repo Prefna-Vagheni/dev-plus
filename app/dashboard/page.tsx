@@ -159,6 +159,7 @@ function StatsCard({
   title: string;
   value: string | number;
   description: string;
+  //eslint-disable-next-line
   icon: any;
 }) {
   return (
