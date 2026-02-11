@@ -80,15 +80,50 @@ export class GitHubService {
         `[GitHub Sync] Syncing commits since ${sinceDate.toISOString()}`,
       );
 
-      const user = await prisma.user.findUnique({
+      // 1. Fetch user to check if username exists
+      let user = await prisma.user.findUnique({
         where: { id: this.userId },
-        select: { githubUsername: true },
+        select: { id: true, githubUsername: true },
       });
 
+      // --- FIX START: Auto-repair missing username ---
       if (!user?.githubUsername) {
-        throw new Error('User GitHub username not found');
+        console.log('[GitHub Sync] Username missing. Fetching from GitHub...');
+
+        try {
+          // Use your existing client to fetch the profile
+          const githubProfile = await this.githubClient.getUser();
+
+          if (githubProfile?.login) {
+            // Update the database immediately
+            user = await prisma.user.update({
+              where: { id: this.userId },
+              data: {
+                githubUsername: githubProfile.login,
+                githubId: String(githubProfile.id),
+              },
+              select: { id: true, githubUsername: true },
+            });
+            console.log(
+              `[GitHub Sync] Database repaired. Username: ${user.githubUsername}`,
+            );
+          }
+        } catch (err) {
+          console.error(
+            '[GitHub Sync] Failed to auto-repair user profile:',
+            err,
+          );
+        }
+      }
+      // --- FIX END ---
+
+      if (!user?.githubUsername) {
+        throw new Error(
+          'User GitHub username not found and could not be fetched',
+        );
       }
 
+      // Proceed with syncing commits using the valid username
       const commits = await this.githubClient.getUserCommits(
         user.githubUsername,
         sinceDate,
@@ -97,7 +132,7 @@ export class GitHubService {
       let syncedCount = 0;
 
       for (const commit of commits) {
-        // Check if commit already exists
+        // ... (rest of the loop remains exactly the same as your file) ...
         const exists = await prisma.activityEvent.findFirst({
           where: {
             userId: this.userId,

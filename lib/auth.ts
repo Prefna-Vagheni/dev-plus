@@ -18,6 +18,14 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
       // Request additional scopes for GitHub API access
       scope: ['user:email', 'read:user', 'repo'],
+      mapProfileToUser: async (profile) => {
+        return {
+          githubUsername: profile.login, // Maps 'login' to your DB field
+          githubId: String(profile.id),
+          image: profile.avatar_url,
+          name: profile.name || profile.login,
+        };
+      },
     },
   },
 
