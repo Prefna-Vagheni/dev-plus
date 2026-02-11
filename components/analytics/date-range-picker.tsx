@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
@@ -13,6 +12,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useState } from 'react';
 
 interface DateRangePickerProps {
   value: DateRange | undefined;
@@ -25,9 +32,43 @@ export function DateRangePicker({
   onChange,
   className,
 }: DateRangePickerProps) {
+  const [open, setOpen] = useState(false);
+
+  // Preset options
+  const presets = [
+    {
+      label: 'Last 7 days',
+      getValue: () => ({
+        from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        to: new Date(),
+      }),
+    },
+    {
+      label: 'Last 30 days',
+      getValue: () => ({
+        from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        to: new Date(),
+      }),
+    },
+    {
+      label: 'Last 90 days',
+      getValue: () => ({
+        from: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+        to: new Date(),
+      }),
+    },
+    {
+      label: 'This year',
+      getValue: () => ({
+        from: new Date(new Date().getFullYear(), 0, 1),
+        to: new Date(),
+      }),
+    },
+  ];
+
   return (
     <div className={cn('grid gap-2', className)}>
-      <Popover>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             id="date"
@@ -52,15 +93,37 @@ export function DateRangePicker({
             )}
           </Button>
         </PopoverTrigger>
+
         <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            initialFocus
-            mode="range"
-            defaultMonth={value?.from}
-            selected={value}
-            onSelect={onChange}
-            numberOfMonths={2}
-          />
+          <div className="flex">
+            {/* Presets sidebar */}
+            <div className="border-r p-3 space-y-1">
+              <div className="text-sm font-medium mb-2">Presets</div>
+              {presets.map((preset) => (
+                <Button
+                  key={preset.label}
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    onChange(preset.getValue());
+                    setOpen(false);
+                  }}
+                >
+                  {preset.label}
+                </Button>
+              ))}
+            </div>
+
+            <Calendar
+              initialFocus
+              mode="range"
+              defaultMonth={value?.from}
+              selected={value}
+              onSelect={onChange}
+              numberOfMonths={2}
+            />
+          </div>
         </PopoverContent>
       </Popover>
     </div>

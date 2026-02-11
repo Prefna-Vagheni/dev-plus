@@ -16,6 +16,7 @@ import { CommitsChart } from '@/components/charts/commits-chart';
 import { LanguageChart } from '@/components/charts/language-chart';
 import { ActivityTimeline } from '@/components/analytics/activity-timeline';
 import { RepositoriesList } from '@/components/github/repositories-list';
+import Range from '@/components/date-range/date-range-picker';
 
 // Stats cards data (will be dynamic later)
 async function getStats() {
@@ -222,7 +223,11 @@ export default async function DashboardPage() {
             Here&apos;s what&apos;s happening with your development activity
           </p>
         </div>
-        <GitHubSyncButton />
+
+        <div className="flex items-center gap-2">
+          <Range />
+          <GitHubSyncButton />
+        </div>
       </div>
       <Suspense
         fallback={
