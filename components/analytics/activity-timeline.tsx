@@ -17,6 +17,7 @@ interface TimelineEvent {
   type: string;
   repositoryName: string | null;
   language: string | null;
+  //eslint-disable-next-line
   data: any;
   occurredAt: string;
 }
@@ -89,7 +90,7 @@ export function ActivityTimeline() {
           )}
 
           {events && events.length > 0 ? (
-            events.map((event, index) => (
+            events.map((event) => (
               <div
                 key={event.id}
                 className="relative flex items-start gap-4 transition-all hover:bg-muted/50 p-2 -m-2 rounded-lg"
@@ -134,7 +135,7 @@ export function ActivityTimeline() {
 
                   {/* Message / Title */}
                   {(event.data?.message || event.data?.title) && (
-                    <div className="text-sm text-muted-foreground break-words">
+                    <div className="text-sm text-muted-foreground wrap-break-words">
                       <p className="line-clamp-2 leading-relaxed">
                         {event.data.message || event.data.title}
                       </p>
