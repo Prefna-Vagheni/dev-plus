@@ -2,8 +2,9 @@
 import { Job } from 'bullmq';
 import { createGitHubService } from '@/lib/github/service';
 import { prisma } from '@/lib/db';
-import { JOB_TYPES } from '../config';
+import { addJob, JOB_TYPES } from '../config';
 import { emitToUser } from '@/lib/websocket/server';
+import { CacheInvalidation } from '@/lib/cache/invalidation';
 
 interface GitHubSyncJobData {
   userId: string;
@@ -55,22 +56,26 @@ export async function processGitHubSyncJob(job: Job<GitHubSyncJobData>) {
     switch (syncType) {
       case 'repositories':
         result = await githubService.syncRepositories();
-        await job.updateProgress(100);
+        // await job.updateProgress(100);
+        await CacheInvalidation.invalidateByEventType(userId, 'REPOSITORY');
         break;
 
       case 'commits':
         result = await githubService.syncCommits(sinceDate);
-        await job.updateProgress(100);
+        // await job.updateProgress(100);
+        await CacheInvalidation.invalidateByEventType(userId, 'COMMIT');
         break;
 
       case 'pullRequests':
         result = await githubService.syncPullRequests(sinceDate);
-        await job.updateProgress(100);
+        // await job.updateProgress(100);
+        await CacheInvalidation.invalidateByEventType(userId, 'PULL_REQUEST');
         break;
 
       case 'issues':
         result = await githubService.syncIssues(sinceDate);
-        await job.updateProgress(100);
+        // await job.updateProgress(100);
+        await CacheInvalidation.invalidateByEventType(userId, 'ISSUE');
         break;
 
       case 'all':
@@ -94,13 +99,37 @@ export async function processGitHubSyncJob(job: Job<GitHubSyncJobData>) {
 
         result.issues = await githubService.syncIssues(sinceDate);
         await job.updateProgress(100);
+
+        // Invalidate all caches after full sync
+        await CacheInvalidation.invalidateAfterSync(userId);
         break;
     }
+
+    await job.updateProgress(95);
 
     // Update user's last sync timestamp
     await prisma.user.update({
       where: { id: userId },
       data: { updatedAt: new Date() },
+    });
+
+    // Schedule cache warming
+    await addJob('dataAggregation', 'warm-cache', {
+      userId,
+    });
+
+    await job.updateProgress(100);
+
+    // Emit WebSocket event
+    emitToUser(userId, 'sync:complete', {
+      syncType,
+      itemsProcessed:
+        typeof result === 'object' && 'synced' in result
+          ? result.synced
+          : Array.isArray(result)
+            ? result.length
+            : 0,
+      timestamp: new Date().toISOString(),
     });
 
     // Create sync job record
@@ -129,18 +158,6 @@ export async function processGitHubSyncJob(job: Job<GitHubSyncJobData>) {
       `[GitHub Sync Job] Completed ${syncType} for user ${userId}`,
       result,
     );
-
-    emitToUser(userId, 'sync:complete', {
-      syncType,
-      itemsProcessed: result.synced || 0,
-      timestamp: new Date().toISOString(),
-    });
-
-    // Emit stats update
-    emitToUser(userId, 'stats:updated', {
-      userId,
-      timestamp: new Date().toISOString(),
-    });
 
     return {
       success: true,

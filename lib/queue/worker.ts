@@ -3,6 +3,7 @@ import { Worker, Job } from 'bullmq';
 import { QUEUE_NAMES, defaultQueueOptions } from './config';
 import { processGitHubSyncJob } from './processors/github-sync.processor';
 import { processDataAggregationJob } from './processors/data-aggregation.processor';
+import { processCacheWarmingJob } from './processors/cache-warming.processor';
 
 // GitHub Sync Worker
 export const githubSyncWorker = new Worker(
@@ -29,6 +30,33 @@ export const dataAggregationWorker = new Worker(
     concurrency: 3,
   },
 );
+
+// Add Cache Warming Worker
+export const cacheWarmingWorker = new Worker(
+  QUEUE_NAMES.DATA_AGGREGATION,
+  async (job: Job) => {
+    if (job.name === 'warm-cache') {
+      console.log(`[Worker] Processing cache warming job ${job.id}`);
+      return processCacheWarmingJob(job);
+    }
+
+    // Existing aggregation logic
+    return processDataAggregationJob(job);
+  },
+  {
+    ...defaultQueueOptions,
+    concurrency: 3,
+  },
+);
+
+// Event handlers
+cacheWarmingWorker.on('completed', (job, result) => {
+  console.log(`[Worker] Cache warming completed:`, result);
+});
+
+cacheWarmingWorker.on('failed', (job, error) => {
+  console.error(`[Worker] Cache warming failed:`, error);
+});
 
 // Event handlers for GitHub Sync Worker
 githubSyncWorker.on('completed', (job, result) => {

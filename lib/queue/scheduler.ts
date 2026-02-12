@@ -128,6 +128,7 @@ export function initializeSchedulers() {
   const dailySync = scheduleDailySync();
   const dailyAggregation = scheduleDailyAggregation();
   const weeklyCleanup = scheduleWeeklyCleanup();
+  const cacheWarming = scheduleCacheWarming();
 
   console.log('[Scheduler] All cron jobs initialized:');
   console.log('  - Daily Sync: 2:00 AM');
@@ -138,6 +139,7 @@ export function initializeSchedulers() {
     dailySync,
     dailyAggregation,
     weeklyCleanup,
+    cacheWarming,
   };
 }
 
@@ -154,4 +156,24 @@ export function stopSchedulers(
   schedulers.weeklyCleanup.stop();
 
   console.log('[Scheduler] All cron jobs stopped');
+}
+
+/**
+ * Schedule cache warming - runs every 30 minutes
+ */
+export function scheduleCacheWarming() {
+  return cron.schedule('*/30 * * * *', async () => {
+    console.log('[Scheduler] Running cache warming');
+
+    try {
+      // Warm cache for all users (non-aggressive)
+      await addJob('dataAggregation', 'warm-cache', {
+        aggressive: false,
+      });
+
+      console.log('[Scheduler] Cache warming scheduled');
+    } catch (error) {
+      console.error('[Scheduler] Error scheduling cache warming:', error);
+    }
+  });
 }

@@ -76,56 +76,191 @@ export function ActivityTimeline() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Activity Timeline</CardTitle>
+    <Card className="w-full border-none shadow-none sm:border sm:shadow-sm">
+      <CardHeader className="px-4 pb-3 sm:px-6">
+        <CardTitle className="text-xl">Activity Timeline</CardTitle>
         <CardDescription>Your recent development activity</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {events.map((event) => (
-            <div key={event.id} className="flex gap-4">
+      <CardContent className="px-4 sm:px-6">
+        <div className="relative space-y-6">
+          {/* Vertical Connector Line */}
+          {events && events.length > 1 && (
+            <div className="absolute left-4 top-2 bottom-2 w-px bg-border sm:left-4" />
+          )}
+
+          {events && events.length > 0 ? (
+            events.map((event, index) => (
               <div
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${getEventColor(event.type)}`}
+                key={event.id}
+                className="relative flex items-start gap-4 transition-all hover:bg-muted/50 p-2 -m-2 rounded-lg"
               >
-                {getEventIcon(event.type)}
-              </div>
-              <div className="flex-1 space-y-1">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-xs">
-                    {event.type.replace('_', ' ')}
-                  </Badge>
-                  {event.repositoryName && (
-                    <span className="text-sm font-medium">
-                      {event.repositoryName}
-                    </span>
-                  )}
-                  {event.language && (
-                    <Badge variant="secondary" className="text-xs">
-                      {event.language}
-                    </Badge>
-                  )}
+                {/* Icon Container */}
+                <div
+                  className={`relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-4 border-background ${getEventColor(
+                    event.type,
+                  )} shadow-sm`}
+                >
+                  <div className="scale-75 sm:scale-90">
+                    {getEventIcon(event.type)}
+                  </div>
                 </div>
-                {event.data.message && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                    {event.data.message}
+
+                {/* Content Area */}
+                <div className="flex flex-1 flex-col gap-1.5 min-w-0">
+                  {/* Header Row: Badges and Repo Name */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] uppercase tracking-wider h-5"
+                    >
+                      {event.type.replace('_', ' ')}
+                    </Badge>
+
+                    {event.repositoryName && (
+                      <span className="text-sm font-semibold truncate max-w-37.5 sm:max-w-none">
+                        {event.repositoryName}
+                      </span>
+                    )}
+
+                    {event.language && (
+                      <Badge
+                        variant="secondary"
+                        className="text-[10px] h-5 hidden min-[425px]:inline-flex"
+                      >
+                        {event.language}
+                      </Badge>
+                    )}
+                  </div>
+
+                  {/* Message / Title */}
+                  {(event.data?.message || event.data?.title) && (
+                    <div className="text-sm text-muted-foreground break-words">
+                      <p className="line-clamp-2 leading-relaxed">
+                        {event.data.message || event.data.title}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Timestamp */}
+                  <p className="text-xs text-muted-foreground/80 font-medium">
+                    {formatDistanceToNow(new Date(event.occurredAt), {
+                      addSuffix: true,
+                    })}
                   </p>
-                )}
-                {event.data.title && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {event.data.title}
-                  </p>
-                )}
-                <p className="text-xs text-gray-500">
-                  {formatDistanceToNow(new Date(event.occurredAt), {
-                    addSuffix: true,
-                  })}
-                </p>
+                </div>
               </div>
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <p className="text-sm text-muted-foreground">
+                No recent activity found.
+              </p>
             </div>
-          ))}
+          )}
         </div>
       </CardContent>
     </Card>
+    // <Card className="w-full">
+    //   <CardHeader className="pb-3 sm:px-6">
+    //     <CardTitle className="text-xl">Activity Timeline</CardTitle>
+    //     <CardDescription>Your recent development activity</CardDescription>
+    //   </CardHeader>
+    //   <CardContent className="px-1 sm:px-6">
+    //     <div className="relative space-y-4">
+    //       {events && events.length > 0 ? (
+    //         events.map((event) => (
+    //           <div
+    //             key={event.id}
+    //             className="relative flex items-start gap-4 transition-all hover:bg-muted/30 p-2 -m-2"
+    //           >
+    //             <div
+    //               className={`relative z-10 flex h-6 w-6  sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full ${getEventColor(event.type)}`}
+    //             >
+    //               {getEventIcon(event.type)}
+    //             </div>
+    //             <div className="flex flex-1 flex-col gap-1 min-w-0">
+    //               <div className="flex items-center gap-2">
+    //                 <Badge variant="outline" className="text-xs">
+    //                   {event.type.replace('_', ' ')}
+    //                 </Badge>
+    //                 {event.repositoryName && (
+    //                   <span className="text-sm font-medium truncate max-w-37.5 sm:max-w-none">
+    //                     {event.repositoryName}
+    //                   </span>
+    //                 )}
+    //                 {event.language && (
+    //                   <Badge
+    //                     variant="secondary"
+    //                     className="text-[10px] h-5 hidden xs:inline-flex"
+    //                   >
+    //                     {event.language}
+    //                   </Badge>
+    //                 )}
+    //               </div>
+    //               {event.data?.message && (
+    //                 <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+    //                   {event.data.message}
+    //                 </p>
+    //               )}
+    //               {event.data?.title && (
+    //                 <p className="text-sm text-gray-600 dark:text-gray-400">
+    //                   {event.data.title}
+    //                 </p>
+    //               )}
+    //               <p className="text-xs text-gray-500">
+    //                 {formatDistanceToNow(new Date(event.occurredAt), {
+    //                   addSuffix: true,
+    //                 })}
+    //               </p>
+    //             </div>
+    //           </div>
+    //         ))
+    //       ) : (
+    //         <p className="text-sm text-gray-500">No recent activity found.</p>
+    //       )}
+    //       {/* {events.map((event) => (
+    //         <div key={event.id} className="flex gap-4">
+    //           <div
+    //             className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${getEventColor(event.type)}`}
+    //           >
+    //             {getEventIcon(event.type)}
+    //           </div>
+    //           <div className="flex-1 space-y-1">
+    //             <div className="flex items-center gap-2">
+    //               <Badge variant="outline" className="text-xs">
+    //                 {event.type.replace('_', ' ')}
+    //               </Badge>
+    //               {event.repositoryName && (
+    //                 <span className="text-sm font-medium">
+    //                   {event.repositoryName}
+    //                 </span>
+    //               )}
+    //               {event.language && (
+    //                 <Badge variant="secondary" className="text-xs">
+    //                   {event.language}
+    //                 </Badge>
+    //               )}
+    //             </div>
+    //             {event.data.message && (
+    //               <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+    //                 {event.data.message}
+    //               </p>
+    //             )}
+    //             {event.data.title && (
+    //               <p className="text-sm text-gray-600 dark:text-gray-400">
+    //                 {event.data.title}
+    //               </p>
+    //             )}
+    //             <p className="text-xs text-gray-500">
+    //               {formatDistanceToNow(new Date(event.occurredAt), {
+    //                 addSuffix: true,
+    //               })}
+    //             </p>
+    //           </div>
+    //         </div>
+    //       ))} */}
+    //     </div>
+    //   </CardContent>
+    // </Card>
   );
 }
