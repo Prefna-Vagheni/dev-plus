@@ -36,9 +36,10 @@ const navigation = [
     icon: GitBranch,
   },
   {
-    name: 'Insights',
-    href: '/dashboard/insights',
+    name: 'AI Insights',
     icon: Sparkles,
+    href: '/dashboard/insights',
+    color: 'text-purple-500',
   },
   {
     name: 'Settings',

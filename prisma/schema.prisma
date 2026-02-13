@@ -266,34 +266,52 @@ enum InsightType {
   NATURAL_LANGUAGE_QUERY
   CUSTOM
 }
-
 model AIInsight {
-  id     String      @id @default(cuid())
-  userId String      @map("user_id")
+  id           String   @id @default(cuid())
+  userId       String
+  insightType  String
+  title        String
+  query        String?  @db.Text
+  response     String   @db.Text
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
   
-  // Insight metadata
-  insightType InsightType @map("insight_type")
-  title       String?
-  query       String?     @db.Text
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  // AI response
-  response String @db.Text
-  
-  // Context data used to generate insight
-  contextData Json? @map("context_data")
-  
-  // Cache management
-  expiresAt DateTime? @map("expires_at")
-  isPublic  Boolean   @default(false) @map("is_public")
-  
-  createdAt DateTime @default(now()) @map("created_at")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, insightType, createdAt(sort: Desc)])
+  @@index([userId])
   @@index([expiresAt])
   @@map("ai_insights")
 }
+
+
+
+// model AIInsight {
+//   id     String      @id @default(cuid())
+//   userId String      @map("user_id")
+  
+//   // Insight metadata
+//   insightType InsightType @map("insight_type")
+//   title       String?
+//   query       String?     @db.Text
+  
+//   // AI response
+//   response String @db.Text
+  
+//   // Context data used to generate insight
+//   contextData Json? @map("context_data")
+  
+//   // Cache management
+//   expiresAt DateTime? @map("expires_at")
+//   isPublic  Boolean   @default(false) @map("is_public")
+  
+//   createdAt DateTime @default(now()) @map("created_at")
+
+//   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+//   @@index([userId, insightType, createdAt(sort: Desc)])
+//   @@index([expiresAt])
+//   @@map("ai_insights")
+// }
 
 // ============================================
 // API Keys (for extensions/integrations)
