@@ -28,6 +28,7 @@ export function GitHubSyncButton({
       onSyncComplete?.();
     } catch (error) {
       // Error is handled by the hook
+      console.log(error);
     }
   };
 

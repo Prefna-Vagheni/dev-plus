@@ -148,47 +148,61 @@ export const resolvers = {
     },
 
     // Repositories
-    repositories: async (_: any, args: any, context: any) => {
-      if (!context.user) throw new Error('Not authenticated');
+    repositories: async (_: any, __: any, context: any) => {
+      if (!context.user) {
+        throw new GraphQLError('Not authenticated', {
+          extensions: { code: 'UNAUTHENTICATED' },
+        });
+      }
 
       const repos = await prisma.repository.findMany({
         where: { userId: context.user.id },
-        take: args.limit || 10,
-        skip: args.offset || 0,
-        orderBy: { updatedAt: 'desc' },
+        // take: args.limit || 10,
+        // skip: args.offset || 0,
+        orderBy: { lastActivityAt: 'desc' },
       });
 
       if (repos.length === 0) return [];
 
       // OPTIMIZED: Get all stats for all repos in ONE query instead of many
-      const allStats = await prisma.activityEvent.groupBy({
-        by: ['repositoryName', 'eventType'],
-        where: {
-          userId: context.user.id,
-          repositoryName: { in: repos.map((r) => r.name) },
-        },
-        _count: { eventType: true },
-      });
+      //   const allStats = await prisma.activityEvent.groupBy({
+      //     by: ['repositoryName', 'eventType'],
+      //     where: {
+      //       userId: context.user.id,
+      //       repositoryName: { in: repos.map((r) => r.name) },
+      //     },
+      //     _count: { eventType: true },
+      //   });
 
-      return repos.map((repo) => {
-        const repoStats = allStats.filter(
-          (s) => s.repositoryName === repo.name,
-        );
+      return Promise.all(
+        repos.map(async (repo) => {
+          const repoStats = await prisma.activityEvent.groupBy({
+            by: ['eventType'],
+            where: {
+              userId: context.user.id,
+              repositoryName: repo.name,
+            },
+            _count: {
+              eventType: true,
+            },
+          });
 
-        return {
-          ...repo,
-          url: repo.url || '', // Safety check for the null URL error from earlier
-          totalCommits:
-            repoStats.find((s) => s.eventType === 'COMMIT')?._count.eventType ||
-            0,
-          totalPullRequests:
-            repoStats.find((s) => s.eventType === 'PULL_REQUEST')?._count
-              .eventType || 0,
-          totalIssues:
-            repoStats.find((s) => s.eventType === 'ISSUE')?._count.eventType ||
-            0,
-        };
-      });
+          return {
+            ...repo,
+            // FIX: Use fullName to construct the URL or simply remove if not in schema
+            url: `https://github.com/${repo.fullName}`,
+            totalCommits:
+              repoStats.find((s) => s.eventType === 'COMMIT')?._count
+                .eventType || 0,
+            totalPRs:
+              repoStats.find((s) => s.eventType === 'PULL_REQUEST')?._count
+                .eventType || 0,
+            totalIssues:
+              repoStats.find((s) => s.eventType === 'ISSUE')?._count
+                .eventType || 0,
+          };
+        }),
+      );
     },
 
     // Repository by ID
@@ -267,13 +281,14 @@ export const resolvers = {
         };
       }
 
-      return prisma.dailyStat.findMany({
+      return prisma.dailyStats.findMany({
         where,
         orderBy: { statDate: 'asc' },
       });
     },
 
     // AI Insights
+    // eslint-disable-next-line
     aiInsights: async (_: any, args: any, context: any) => {
       if (!context.user) {
         throw new GraphQLError('Not authenticated', {

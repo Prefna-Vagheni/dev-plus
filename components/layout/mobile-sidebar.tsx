@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Menu,
-  X,
   BarChart3,
   Home,
   Calendar,
@@ -16,15 +15,22 @@ import {
   Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Activity', href: '/dashboard/activity', icon: Calendar },
   { name: 'Analytics', href: '/dashboard/analytics', icon: TrendingUp },
   { name: 'Repositories', href: '/dashboard/repositories', icon: GitBranch },
-  { name: 'Insights', href: '/dashboard/insights', icon: Sparkles },
+  { name: 'AI Insights', href: '/dashboard/insights', icon: Sparkles },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 
@@ -35,12 +41,18 @@ export function MobileSidebar() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild className="md:hidden">
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" aria-label="Open menu">
           <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle menu</span>
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="w-64 p-0">
+        <VisuallyHidden.Root>
+          <SheetTitle>Navigation Menu</SheetTitle>
+          <SheetDescription>
+            Access dashboard sections and settings
+          </SheetDescription>
+        </VisuallyHidden.Root>
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center gap-2 border-b px-6">

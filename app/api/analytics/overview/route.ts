@@ -4,7 +4,7 @@ import { createAnalyticsService } from '@/lib/analytics/service';
 import { withRateLimit, RateLimits } from '@/lib/middleware/rate-limit';
 import { createCachedAnalyticsService } from '@/lib/analytics/cached-service';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const session = await getSession();
     if (!session?.user) {

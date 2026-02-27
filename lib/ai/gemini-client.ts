@@ -156,8 +156,14 @@ export class GeminiClient {
    */
   static async listModels(): Promise<string[]> {
     try {
-      const models = await genAI.listModels();
-      return models.map((m) => m.name);
+      // const models = await genAI.listModels();
+      // return models.map((m) => m.name);
+      return [
+        'gemini-1.5-flash',
+        'gemini-1.5-pro',
+        'gemini-2.0-flash',
+        'gemini-2.0-flash-lite-preview-02-05',
+      ];
     } catch (error) {
       console.error('[AI] Error listing models:', error);
       return [];

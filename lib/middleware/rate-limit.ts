@@ -57,7 +57,7 @@ export async function withRateLimit(
   // Get identifier (IP address or user ID)
   const id =
     identifier ||
-    request.ip ||
+    (request as any).ip ||
     request.headers.get('x-forwarded-for') ||
     'anonymous';
 

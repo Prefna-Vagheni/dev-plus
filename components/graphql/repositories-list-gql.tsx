@@ -1,7 +1,7 @@
 // components/graphql/repositories-list-gql.tsx - GraphQL-powered Repository List
 'use client';
 
-import { useQuery } from '@apollo/client/react';
+// import { useQuery } from '@apollo/client';
 import { GET_REPOSITORIES } from '@/lib/graphql/queries';
 import {
   Card,
@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Star, GitFork, Code, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useQuery } from '@apollo/client/react';
 
 interface Repository {
   id: string;

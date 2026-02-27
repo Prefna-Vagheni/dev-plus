@@ -137,6 +137,7 @@ export function useAIInsightsStream() {
   return {
     generateStreamingInsight,
     streamedContent,
+    setStreamedContent,
     isStreaming,
   };
 }

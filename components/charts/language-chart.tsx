@@ -39,8 +39,8 @@ export function LanguageChart({ data }: LanguageChartProps) {
           cx="50%"
           cy="50%"
           labelLine={false}
-          label={({ name, percentage }) =>
-            `${name} (${percentage.toFixed(1)}%)`
+          label={({ payload }) =>
+            `${payload.name} (${payload.percentage.toFixed(1)}%)`
           }
           outerRadius={80}
           fill="#8884d8"

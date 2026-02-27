@@ -20,6 +20,7 @@ import {
 import { Sparkles, Loader2 } from 'lucide-react';
 import { useAIInsightsStream, InsightType } from '@/hooks/use-ai-insights';
 import ReactMarkdown from 'react-markdown';
+import { RegenerateInsightButton } from './regenerate-insight-button';
 
 const INSIGHT_TYPES: Array<{
   value: InsightType;
@@ -62,8 +63,12 @@ export function InsightGenerator() {
   const [selectedType, setSelectedType] =
     useState<InsightType>('weekly-summary');
   const [query, setQuery] = useState('');
-  const { generateStreamingInsight, streamedContent, isStreaming } =
-    useAIInsightsStream();
+  const {
+    generateStreamingInsight,
+    streamedContent,
+    setStreamedContent,
+    isStreaming,
+  } = useAIInsightsStream();
 
   const handleGenerate = () => {
     generateStreamingInsight(selectedType, query || undefined);
@@ -145,6 +150,15 @@ export function InsightGenerator() {
         <Card>
           <CardHeader>
             <CardTitle>{selectedInsight?.label}</CardTitle>
+            {!isStreaming && streamedContent && (
+              <RegenerateInsightButton
+                insightType={selectedType}
+                query={query || undefined}
+                onRegenerated={(newInsight) => {
+                  setStreamedContent(newInsight);
+                }}
+              />
+            )}
           </CardHeader>
           <CardContent>
             <div className="prose prose-sm dark:prose-invert max-w-none">

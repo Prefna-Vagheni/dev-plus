@@ -46,7 +46,7 @@ export function RealtimeActivityUpdates() {
       toast({
         title: 'New Activity',
         description: `${data.type}: ${data.message.slice(0, 50)}...`,
-        duration: 3000,
+        // duration: 3000,
       });
     };
 

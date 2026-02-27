@@ -45,7 +45,12 @@ export class AIService {
       overview,
       languages: languages.languages,
       repositories,
-      recentActivity: timeline,
+      recentActivity: timeline.map((event) => ({
+        type: event.type,
+        repositoryName: event.repositoryName ?? 'Unknown Repository', // Provide fallback
+        data: event.data,
+        occurredAt: event.occurredAt,
+      })),
     };
   }
 

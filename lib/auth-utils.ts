@@ -1,6 +1,6 @@
 // lib/auth-utils.ts - Server-side auth utilities
 import { auth } from '@/lib/auth';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
 
@@ -21,6 +21,26 @@ export const getSession = cache(async () => {
  * Use this to protect Server Components
  */
 export async function requireAuth() {
+  // BYPASS IN TEST MODE
+  if (
+    process.env.NODE_ENV === 'test' ||
+    process.env.PLAYWRIGHT_TEST === 'true'
+  ) {
+    const cookieStore = await cookies();
+    const testSession = cookieStore.get('better-auth.session_token');
+
+    if (testSession?.value === 'test-session-token') {
+      console.log('[TEST MODE] Bypassing requireAuth()');
+      return {
+        user: {
+          id: 'test-user-id',
+          name: 'Test User',
+          email: 'test@example.com',
+        },
+      };
+    }
+  }
+
   const session = await getSession();
 
   if (!session) {

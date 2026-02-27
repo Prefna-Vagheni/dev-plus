@@ -12,7 +12,7 @@ interface HeaderProps {
   title?: string;
 }
 
-export function Header({ title = 'Dashboard' }: HeaderProps) {
+export async function Header({ title = 'Dashboard' }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 border-b bg-white dark:bg-gray-900">
       <div className="flex h-16 items-center gap-4 px-6">
@@ -37,7 +37,12 @@ export function Header({ title = 'Dashboard' }: HeaderProps) {
         <div className="flex items-center gap-2">
           <ThemeToggle />
 
-          <Button variant="ghost" size="icon" className="relative">
+          <Button
+            variant="ghost"
+            aria-label="Toggle menu"
+            size="icon"
+            className="relative"
+          >
             <Bell className="h-5 w-5" />
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-blue-600"></span>
           </Button>

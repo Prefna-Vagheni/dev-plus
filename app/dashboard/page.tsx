@@ -363,6 +363,7 @@ import { LanguageChart } from '@/components/charts/language-chart';
 import { ActivityTimeline } from '@/components/analytics/activity-timeline';
 import { RealtimeActivityUpdates } from '@/components/realtime/activity-updates';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ExportData } from '@/components/analytics/export-data';
 
 export default function DashboardPage() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -446,6 +447,9 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
           <DateRangePicker value={dateRange} onChange={setDateRange} />
           <GitHubSyncButton onSyncComplete={fetchAnalytics} />
+          <ExportData
+            dateRange={dateRange as { from: Date; to: Date } | undefined}
+          />
         </div>
       </div>
 

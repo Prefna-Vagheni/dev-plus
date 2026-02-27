@@ -1,16 +1,18 @@
 // test-gemini-models.js - Test which models are available
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 async function listAvailableModels() {
   try {
     console.log('🔍 Fetching available Gemini models...\n');
 
-    const models = await genAI.listModels();
+    const result = await (genAI as any).listModels();
+
+    const models = result.models || result;
 
     console.log('✅ Available models:\n');
-    models.forEach((model, index) => {
+    models.forEach((model: any, index: number) => {
       console.log(`${index + 1}. ${model.name}`);
       console.log(`   Display Name: ${model.displayName}`);
       console.log(
@@ -39,7 +41,7 @@ async function listAvailableModels() {
         console.log(`❌ ${modelName} - FAILS`);
       }
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Error:', error.message);
   }
 }

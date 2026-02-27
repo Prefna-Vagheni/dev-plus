@@ -231,11 +231,11 @@ async function main() {
       title: 'Weekly Summary',
       response:
         "This week, you've been highly productive with 42 commits across 3 repositories. Your primary focus has been on TypeScript development, with significant time spent in the devpulse project. Keep up the great work!",
-      contextData: {
-        commits: 42,
-        repositories: 3,
-        languages: ['TypeScript', 'JavaScript', 'Rust'],
-      },
+      // metadata: {
+      //   commits: 42,
+      //   repositories: 3,
+      //   languages: ['TypeScript', 'JavaScript', 'Rust'],
+      // },
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     },
   });

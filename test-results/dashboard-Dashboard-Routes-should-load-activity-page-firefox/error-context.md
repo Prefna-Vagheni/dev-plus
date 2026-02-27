@@ -1,0 +1,41 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - img [ref=e6]
+        - heading "DevPulse" [level=1] [ref=e11]
+      - heading "Your Developer Analytics Platform" [level=2] [ref=e12]
+      - paragraph [ref=e13]: Track your coding activity, analyze patterns, and get AI-powered insights to optimize your development workflow.
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - img [ref=e16]
+          - generic [ref=e21]:
+            - heading "Real-time Analytics" [level=3] [ref=e22]
+            - paragraph [ref=e23]: Live dashboard with insights from your GitHub activity
+        - generic [ref=e24]:
+          - img [ref=e25]
+          - generic [ref=e34]:
+            - heading "AI-Powered Insights" [level=3] [ref=e35]
+            - paragraph [ref=e36]: Get personalized recommendations and pattern analysis
+        - generic [ref=e37]:
+          - img [ref=e38]
+          - generic [ref=e40]:
+            - heading "Productivity Tracking" [level=3] [ref=e41]
+            - paragraph [ref=e42]: Monitor coding time, commits, PRs, and more
+    - generic [ref=e43]:
+      - generic [ref=e44]:
+        - generic [ref=e45]: Welcome back
+        - generic [ref=e46]: Sign in with your GitHub account to continue
+      - generic [ref=e47]:
+        - button "Continue with GitHub" [ref=e48]:
+          - img
+          - text: Continue with GitHub
+        - generic [ref=e49]: By signing in, you agree to sync your GitHub activity data. We only access public repository information and your profile.
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e55] [cursor=pointer]:
+    - img [ref=e56]
+  - alert [ref=e60]
+```

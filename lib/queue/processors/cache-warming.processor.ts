@@ -25,7 +25,7 @@ export async function processCacheWarmingJob(job: Job<CacheWarmingJobData>) {
         where: {
           accounts: {
             some: {
-              provider: 'github',
+              providerId: 'github',
             },
           },
         },

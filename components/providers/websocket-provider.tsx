@@ -51,7 +51,7 @@ export function WebSocketProvider({
       toast({
         title: 'Connected',
         description: 'Real-time updates enabled',
-        duration: 3000,
+        // duration: 3000,
       });
       setShowConnectionToast(false);
     }

@@ -303,13 +303,13 @@ export class GitHubService {
                   title: issue.title,
                   state: issue.state,
                   url: issue.html_url,
-                  author: issue.user?.login,
-                  labels: issue.labels.map((l) =>
-                    typeof l === 'string' ? l : l.name,
-                  ),
+                  // Clean labels: map to strings and filter out any undefined
+                  labels: issue.labels
+                    .map((l: any) => (typeof l === 'string' ? l : l.name))
+                    .filter(Boolean),
                   createdAt: issue.created_at,
                   closedAt: issue.closed_at,
-                },
+                } as any, // Cast to any to satisfy Prisma's complex Json type
                 occurredAt: new Date(issue.created_at),
               },
             });

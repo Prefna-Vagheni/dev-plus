@@ -45,7 +45,7 @@ export default async function HomePage() {
 
           <h1 className="mb-6 text-5xl font-bold tracking-tight sm:text-6xl">
             Track Your Developer
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               {' '}
               Journey
             </span>

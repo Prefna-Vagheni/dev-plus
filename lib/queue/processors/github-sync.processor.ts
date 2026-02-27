@@ -50,59 +50,78 @@ export async function processGitHubSyncJob(job: Job<GitHubSyncJobData>) {
 
     await job.updateProgress(20);
 
-    let result;
+    let result: any = {};
 
-    // Execute sync based on type
-    switch (syncType) {
-      case 'repositories':
-        result = await githubService.syncRepositories();
-        // await job.updateProgress(100);
-        await CacheInvalidation.invalidateByEventType(userId, 'REPOSITORY');
-        break;
+    if (syncType === 'all') {
+      result = {
+        repositories: [],
+        commits: { total: 0, synced: 0 },
+        pullRequests: { synced: 0 },
+        issues: { synced: 0 },
+      };
 
-      case 'commits':
-        result = await githubService.syncCommits(sinceDate);
-        // await job.updateProgress(100);
-        await CacheInvalidation.invalidateByEventType(userId, 'COMMIT');
-        break;
+      result.repositories = await githubService.syncRepositories();
+      await job.updateProgress(40);
 
-      case 'pullRequests':
-        result = await githubService.syncPullRequests(sinceDate);
-        // await job.updateProgress(100);
-        await CacheInvalidation.invalidateByEventType(userId, 'PULL_REQUEST');
-        break;
+      result.commits = await githubService.syncCommits(sinceDate);
+      await job.updateProgress(60);
 
-      case 'issues':
-        result = await githubService.syncIssues(sinceDate);
-        // await job.updateProgress(100);
-        await CacheInvalidation.invalidateByEventType(userId, 'ISSUE');
-        break;
+      result.pullRequests = await githubService.syncPullRequests(sinceDate);
+      await job.updateProgress(80);
 
-      case 'all':
-      default:
-        // Progress tracking for full sync
-        result = {
-          repositories: [],
-          commits: {},
-          pullRequests: {},
-          issues: {},
-        };
+      result.issues = await githubService.syncIssues(sinceDate);
+    } else {
+      // Execute sync based on type
+      switch (syncType) {
+        case 'repositories':
+          result = await githubService.syncRepositories();
+          // await job.updateProgress(100);
+          await CacheInvalidation.invalidateByEventType(userId, 'REPOSITORY');
+          break;
 
-        result.repositories = await githubService.syncRepositories();
-        await job.updateProgress(40);
+        case 'commits':
+          result = await githubService.syncCommits(sinceDate);
+          // await job.updateProgress(100);
+          await CacheInvalidation.invalidateByEventType(userId, 'COMMIT');
+          break;
 
-        result.commits = await githubService.syncCommits(sinceDate);
-        await job.updateProgress(60);
+        case 'pullRequests':
+          result = await githubService.syncPullRequests(sinceDate);
+          // await job.updateProgress(100);
+          await CacheInvalidation.invalidateByEventType(userId, 'PULL_REQUEST');
+          break;
 
-        result.pullRequests = await githubService.syncPullRequests(sinceDate);
-        await job.updateProgress(80);
+        case 'issues':
+          result = await githubService.syncIssues(sinceDate);
+          // await job.updateProgress(100);
+          await CacheInvalidation.invalidateByEventType(userId, 'ISSUE');
+          break;
 
-        result.issues = await githubService.syncIssues(sinceDate);
-        await job.updateProgress(100);
+        default:
+          // Progress tracking for full sync
+          result = {
+            repositories: [],
+            commits: {},
+            pullRequests: {},
+            issues: {},
+          };
 
-        // Invalidate all caches after full sync
-        await CacheInvalidation.invalidateAfterSync(userId);
-        break;
+          result.repositories = await githubService.syncRepositories();
+          await job.updateProgress(40);
+
+          result.commits = await githubService.syncCommits(sinceDate);
+          await job.updateProgress(60);
+
+          result.pullRequests = await githubService.syncPullRequests(sinceDate);
+          await job.updateProgress(80);
+
+          result.issues = await githubService.syncIssues(sinceDate);
+          await job.updateProgress(100);
+
+          // Invalidate all caches after full sync
+          await CacheInvalidation.invalidateAfterSync(userId);
+          break;
+      }
     }
 
     await job.updateProgress(95);
