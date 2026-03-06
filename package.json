@@ -9,7 +9,7 @@
     "start": "cross-env NODE_ENV=production tsx server.ts",
     "lint": "eslint",
     "worker": "tsx watch ./server/worker.ts",
-    "worker:prod": "tsx ./server/worker.ts",
+    "worker:prod": "cross-env NODE_ENV=production tsx ./server/worker.ts",
     "worker:start": "node dist/server/worker.js",
     "test": "jest",
     "test:watch": "jest --watch",
