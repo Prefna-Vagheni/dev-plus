@@ -31,7 +31,7 @@ export const defaultQueueOptions: QueueOptions = {
       count: 100,
     },
     removeOnFail: {
-      age: 7 * 24 * 3600, // Keep failed jobs for 7 days
+      age: 7 * 24 * 3600, // Keep failed jobs for 7 days`
     },
   },
 };
