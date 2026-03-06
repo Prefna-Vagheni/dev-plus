@@ -133,8 +133,10 @@ export async function POST(request: Request) {
 
     // Add job to queue instead of processing synchronously
     const job = await addJob('githubSync', JOB_TYPES.SYNC_ALL, {
-      userId,
-      syncType,
+      // userId,
+      userId: session.user.id,
+      // syncType,
+      syncType: body.syncType || 'all',
       since,
       options: {
         incremental,
@@ -143,7 +145,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: 'Sync job scheduled',
+      message: 'Sync started in background',
       jobId: job.id,
       syncType,
       status: 'queued',

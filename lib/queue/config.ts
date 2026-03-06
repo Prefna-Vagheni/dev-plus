@@ -1,14 +1,25 @@
 // lib/queue/config.ts - Queue configuration
 import { Queue, QueueOptions } from 'bullmq';
+import IORedis from 'ioredis';
 import { redis } from '@/lib/redis';
 
-const connection = {
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-};
+// const connection = {
+//   host: process.env.REDIS_HOST || 'localhost',
+//   port: parseInt(process.env.REDIS_PORT || '6379'),
+// };
+
+// Define the connection using the URL if available, otherwise fallback to host/port
+const connection = process.env.REDIS_URL
+  ? new IORedis(process.env.REDIS_URL, {
+      maxRetriesPerRequest: null, // CRITICAL: BullMQ requires this to be null
+    })
+  : {
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
+    };
 
 export const defaultQueueOptions: QueueOptions = {
-  connection,
+  connection: connection as any,
   defaultJobOptions: {
     attempts: 3,
     backoff: {

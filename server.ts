@@ -25,6 +25,7 @@ app.prepare().then(() => {
 
   // Initialize Socket.io
   const io = initializeSocketServer(server);
+  // const io = new Server();
   console.log('[Server] Socket.io initialized');
 
   server.listen(port, () => {
